@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+  sqlite:
+    build:
+      context: ./database
+    volumes:
+      - nutrition-data:/data
+    command: >
+      sh -c "if [ ! -f /data/.initialized ]; then 
+               python sample_data.py && 
+               touch /data/.initialized; 
+             fi && 
+             echo 'Database is ready!' && 
+             tail -f /dev/null"
+
+  api:
+    build:
+      context: ./backend
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+      - nutrition-data:/data
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - DB_PATH=/data/nutrition.db
+    depends_on:
+      - sqlite
+    command: npm run dev
+
+volumes:
+  nutrition-data:
