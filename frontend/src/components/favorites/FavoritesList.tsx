@@ -5,7 +5,7 @@ import FoodCard from '../foods/FoodCard';
 
 const FavoritesList: React.FC = () => {
   const { isLoggedIn } = useContext(UserContext);
-  const { favorites, isLoading, isError } = useFavorites();
+  const { favorites, isLoading, isError, removeFromFavorites } = useFavorites();
 
   if (!isLoggedIn) {
     return (
@@ -40,12 +40,23 @@ const FavoritesList: React.FC = () => {
     );
   }
 
+  // Handler for food card click in favorites list
+  const handleFoodClick = (foodId: string) => {
+    // Navigate to food detail or perform other actions
+    console.log(`Clicked food with id: ${foodId}`);
+  };
+
   return (
     <div>
       <h2 className="text-xl font-semibold mb-4">Your Favorite Foods</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {favorites.map((food) => (
-          <FoodCard key={food.favorite_id} food={food} />
+          <FoodCard 
+            key={food.favorite_id} 
+            food={food} 
+            onClick={() => handleFoodClick(food.id)}
+            showFavoriteButton={true}
+          />
         ))}
       </div>
     </div>

@@ -2,7 +2,7 @@
 
 export interface Food {
     id: string;
-    brand_name: string;
+    brand_name: string | null;
     brand_owner: string;
     calories: number;
     protein: number;
@@ -10,7 +10,7 @@ export interface Food {
     carbohydrates: number;
     serving_size: number;
     serving_size_unit: string;
-    branded_food_category: string;
+    branded_food_category: string| null;
   }
   
   export interface FoodSearchParams {
