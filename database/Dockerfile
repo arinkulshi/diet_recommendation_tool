@@ -17,13 +17,8 @@ COPY init_db.py .
 COPY sample_data.py .
 COPY branded_food.csv .
 
-# Create volume mount point for the database
-VOLUME /data
-
-# Instead of running the initialization script at build time,
-# we'll let docker-compose handle it at container startup
-# This allows the database to be initialized only once
-# and persist across container restarts
+# Railway doesn't allow VOLUME keyword in Dockerfiles
+# The volume will be managed by the docker-compose configuration
 
 # Start a shell that keeps the container running
 CMD ["tail", "-f", "/dev/null"]

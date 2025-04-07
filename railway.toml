@@ -1,6 +1,0 @@
-[build]
-builder = "DOCKERFILE"
-dockerfilePath = "./docker-compose.yml"
-
-[deploy]
-strategy = "docker-compose"
