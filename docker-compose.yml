@@ -7,13 +7,13 @@ services:
     volumes:
       - nutrition-data:/data
     command: >
-       sh -c "if [ ! -f /data/.initialized ]; then 
-               python sample_data.py && 
-               touch /data/.initialized; 
-             fi && 
-             echo 'Database is ready!' && 
+      sh -c "if [ ! -f /data/.initialized ]; then
+               python sample_data.py &&
+               touch /data/.initialized;
+             fi &&
+             echo 'Database is ready!' &&
              tail -f /dev/null"
-
+  
   api:
     build:
       context: ./backend
@@ -28,6 +28,20 @@ services:
       - DB_PATH=/data/nutrition.db
     depends_on:
       - sqlite
+    command: npm run dev
+
+  frontend:
+    build:
+      context: ./frontend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - api
     command: npm run dev
 
 volumes:
