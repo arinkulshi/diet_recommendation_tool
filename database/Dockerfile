@@ -15,10 +15,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy database initialization scripts
 COPY init_db.py .
 COPY sample_data.py .
-COPY branded_food.csv .
 
-# Railway doesn't allow VOLUME keyword in Dockerfiles
-# The volume will be managed by the docker-compose configuration
+# Create docker-entrypoint.sh file
+COPY docker-entrypoint.sh .
+RUN chmod +x docker-entrypoint.sh
 
-# Start a shell that keeps the container running
-CMD ["tail", "-f", "/dev/null"]
+# Start container with the entrypoint script
+ENTRYPOINT ["/app/docker-entrypoint.sh"]

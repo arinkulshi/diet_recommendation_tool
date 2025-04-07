@@ -32,10 +32,17 @@ The database contains three main tables:
 
 1. Clone this repository
 2. Navigate to the project directory
-3. Build and start the Docker containers:
+3. Make sure to copy the branded_foods.csv into your /database folder or the system will use the sample_data as a backup.  https://fdc.nal.usda.gov/download-datasets
+4. To use the LLM recommender service you need to get an api key from https://aistudio.google.com/apikey create a .env file in the /frontend folder and add the api key  VITE_GEMINI_API_KEY=INSERT_API_KEY_HERE
+5. Build and start the Docker containers:
 
 ```bash
-docker-compose up
+docker-compose up --build
+```
+6. For second run you can without build assuming your database and data is initalized
+
+```bash
+docker-compose up 
 ```
 
 This will:
@@ -45,6 +52,7 @@ This will:
 - Make the database ready for use
 - Run the backend
 - Run the frontend
+- 
 
 ### Accessing the Application
 

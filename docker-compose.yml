@@ -1,55 +1,52 @@
-version: '3'
 services:
   sqlite:
     build:
       context: ./database
     volumes:
       - nutrition-data:/data
-    command: >
-      sh -c "if [ ! -f /data/.initialized ]; then
-               python sample_data.py &&
-               touch /data/.initialized;
-             fi &&
-             echo 'Database is ready!' &&
-             tail -f /dev/null"
-  
+      # Mount the entire project directory to /project in read-only mode
+      # This lets the container find CSV files wherever they are
+      - ./:/project:ro
+    command: ["tail", "-f", "/dev/null"]
+    healthcheck:
+      test: ["CMD", "test", "-f", "/data/.initialized"]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
   api:
     build:
       context: ./backend
     volumes:
-      # In development, mount local code and preserve node_modules
-      - ${NODE_ENV:-development}_api_node_modules:/app/node_modules
-      - ./backend:/app:${NODE_ENV:-development}
-      # Always mount the data volume
+      - ./backend:/app
+      - /app/node_modules
       - nutrition-data:/data
     ports:
-      - "${PORT:-3000}:3000"
+      - "3000:3000"
     environment:
-      - NODE_ENV=${NODE_ENV:-development}
+      - NODE_ENV=development
       - DB_PATH=/data/nutrition.db
     depends_on:
-      - sqlite
-    # Use different commands based on environment
-    command: npm run ${NODE_ENV:-development}
-  
+      sqlite:
+        condition: service_healthy
+    command: npm run dev
+
   frontend:
     build:
       context: ./frontend
     volumes:
-      # In development, mount local code and preserve node_modules
-      - ${NODE_ENV:-development}_frontend_node_modules:/app/node_modules
-      - ./frontend:/app:${NODE_ENV:-development}
+      - ./frontend:/app
+      - /app/node_modules
     ports:
-      - "${FRONTEND_PORT:-5173}:${FRONTEND_PORT:-5173}"
+      - "5173:5173"
     environment:
-      - NODE_ENV=${NODE_ENV:-development}
-      - PORT=${FRONTEND_PORT:-5173}
+      - NODE_ENV=development
+      - PORT=5173
     depends_on:
-      - api
-    # Use different commands based on environment
-    command: sh -c "if [ \"$${NODE_ENV}\" = \"production\" ]; then npm run build && npm run start; else npm run dev; fi"
+      api:
+        condition: service_started
+    command: npm run dev
 
 volumes:
   nutrition-data:
-  development_api_node_modules:
-  development_frontend_node_modules:
