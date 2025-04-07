@@ -1,6 +1,14 @@
-# Nutrition and Diet Recommendation Tool - Database Setup
+# Nutrition and Diet Recommendation Tool
 
-This repository contains a Docker-based SQLite database setup for a nutrition and diet recommendation application.
+This repository contains a complete Docker-based application stack for a nutrition and diet recommendation tool, including database, backend API, and frontend user interface.
+
+## System Architecture
+
+The application consists of three main components:
+
+1. **SQLite Database** - Stores all nutrition data and user information
+2. **Node.js Backend API** - Provides data access and business logic
+3. **React Frontend** - Delivers the user interface
 
 ## Database Structure
 
@@ -9,10 +17,8 @@ The database contains three main tables:
 1. **Foods** - Contains nutritional information for various food items
    - Includes data from branded food products
    - Contains essential nutritional data like calories, protein, fats, and carbohydrates
-
 2. **Users** - Stores basic user information
    - Username, email, and password (hashed)
-
 3. **Favorites** - Manages user-food relationships
    - Allows users to save their favorite foods
 
@@ -26,7 +32,7 @@ The database contains three main tables:
 
 1. Clone this repository
 2. Navigate to the project directory
-3. Build and start the Docker container:
+3. Build and start the Docker containers:
 
 ```bash
 docker-compose up
@@ -40,9 +46,68 @@ This will:
 - Run the backend
 - Run the frontend
 
-### Accessing the Database
+### Accessing the Application
 
-The SQLite database is accessible at `/data/nutrition.db` within the container. 
+- **Frontend**: Access the web application at `http://localhost:5173`
+- **Backend API**: Available at `http://localhost:3000`
+- **Database**: The SQLite database is accessible at `/data/nutrition.db` within the container
+
+### Docker Compose Structure
+
+The application uses a three-service Docker Compose setup:
+
+```yaml
+version: '3'
+
+services:
+  sqlite:
+    build:
+      context: ./database
+    volumes:
+      - nutrition-data:/data
+    command: >
+      sh -c "if [ ! -f /data/.initialized ]; then
+               python sample_data.py &&
+               touch /data/.initialized;
+             fi &&
+             echo 'Database is ready!' &&
+             tail -f /dev/null"
+  
+  api:
+    build:
+      context: ./backend
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+      - nutrition-data:/data
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - DB_PATH=/data/nutrition.db
+    depends_on:
+      - sqlite
+    command: npm run dev
+
+  frontend:
+    build:
+      context: ./frontend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - api
+    command: npm run dev
+
+volumes:
+  nutrition-data:
+```
+
+### Accessing the Database Directly
 
 You can connect to the database using:
 
