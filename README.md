@@ -37,6 +37,8 @@ This will:
 - Create the necessary tables
 - Populate the database with sample food data
 - Make the database ready for use
+- Run the backend
+- Run the frontend
 
 ### Accessing the Database
 
@@ -70,21 +72,3 @@ JOIN foods f ON fav.food_id = f.id
 WHERE fav.user_id = 1;
 ```
 
-## Next Steps
-
-This database setup is the foundation for the nutrition and diet recommendation tool. The next steps would be to:
-
-1. Set up the backend API using Express.js to access this database
-2. Create frontend components to search for foods and display nutritional information
-3. Implement user authentication and favorite foods management
-
-## Data Model Extension
-
-You can extend the database schema to include:
-
-- Meal plans
-- Dietary restrictions
-- Nutritional goals
-- More detailed nutritional information
-
-Simply update the `init_db.py` file with additional table definitions and constraints.
