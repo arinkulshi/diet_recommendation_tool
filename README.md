@@ -12,7 +12,7 @@ The application consists of three main components:
 
 ## Database Structure
 
-The database contains three main tables:
+The database contains three tables:
 
 1. **Foods** - Contains nutritional information for various food items
    - Includes data from branded food products
@@ -144,3 +144,137 @@ JOIN foods f ON fav.food_id = f.id
 WHERE fav.user_id = 1;
 ```
 
+# Design Decisions and Future Improvements
+
+## Key Design Decisions
+
+### Overall Architecture
+
+1. **Containerized Microservices**
+   - We chose a Docker-based architecture to ensure consistency across envs
+   - Each component (database, API, frontend) runs in its own container for better isolation
+   - Volume mounting ensures data persistence between container restarts
+
+2. **MVC Pattern for Backend**
+   - Adopted the Model-View-Controller pattern for the API to improve code organization and maintainability
+   - Models handle data access and business logic
+   - Controllers process requests and coordinate with models
+   - Routes define the API endpoints and connect them to controllers
+
+3. **SQLite for Database**
+   - Chose SQLite for simplicity
+   - Efficient for read-heavy operations common in nutritional data lookup
+   - No separate database server needed, reducing complexity
+   - Appropriate for the expected data size and query patterns
+
+### Frontend Architecture
+
+1. **React + TypeScript**
+   - TypeScript for type safety and better development experience
+   - React for component-based UI architecture
+   - Custom hooks for encapsulating and sharing logic
+
+2. **State Management**
+   - React Query for server state management (API data)
+   - React Context for client state (user information)
+   - Component-local state for UI elements
+
+3. **UI Design**
+   - Tailwind CSS for utility-first styling approach
+   - Mobile-responsive design from the ground up
+   - Card-based UI for consistent presentation of food items
+   - Minimalist design focusing on nutritional data clarity
+
+### Data Flow
+
+1. **Food Search and Display**
+   - Query parameters for flexible search
+   - Pagination to handle large result sets efficiently
+   - Detailed view for comprehensive nutritional information
+
+2. **Favorites System**
+   - Simple toggle mechanism for adding/removing favorites
+   - Efficient lookups for determining favorite status
+   - Separate page for managing favorited items
+
+3. **API Integration**
+   - Axios for HTTP requests with interceptors for error handling
+   - Type-safe API responses mapped to frontend models
+   - Optimistic updates for better user experience
+
+## What We'd Improve or Expand With More Time
+
+### Backend Enhancements
+
+1. **Authentication and Authorization**
+   - Implement JWT-based authentication
+   - Role-based access control
+   - Secure password storage
+
+2. **Database Optimization**
+   - Migration to PostgreSQL for larger datasets and concurrent users
+   - Additional indexes for improved query performance
+   - Database connection pooling
+
+3. **API Expansion**
+   - Implement filtering for more nutritional attributes
+   - Add endpoints for user dietary preferences
+
+4. **Performance and Scalability**
+   - Implement caching layers (Redis)
+   - Add rate limiting for API protection
+
+
+### Frontend Improvements
+
+1. **Enhanced User Experience**
+   - Advanced filtering options for nutritional values
+   - Data visualization with charts and graphs
+   - Compare feature for multiple food items
+
+2. **Expanded Features**
+   - Meal planning functionality
+   - Daily nutrition tracking
+   - Nutrition goals and progress tracking
+
+
+3. **Testing and Quality**
+   - Comprehensive unit test coverage
+   - Integration tests
+   - End-to-end testing with Cypress
+   - Accessibility improvements WCAG
+
+### Integration with LLM Recommender
+
+1. **Enhanced AI Features**
+   - Fine-tune the model for more accurate nutritional recommendations
+   - Personalized recommendations based on user history
+   - Natural language search capabilities
+
+2. **Model Improvements**
+   - Caching common recommendations
+   - Implementing feedback loops for improved suggestions
+   - Multi-language support
+   - Explanation of recommendations
+
+3. **Health and Dietary Analytics**
+   - Nutritional gap analysis
+   - Dietary pattern recognition
+   - Meal suggestions based on available favorites
+   - Allergen and dietary restriction awareness
+
+### DevOps and Infrastructure
+
+1. **CI/CD Pipeline**
+   - Automated testing in the deployment pipeline
+   - Infrastructure as code
+   - Environment promotion strategy
+   - Automated database migrations
+
+2. **Monitoring and Observability**
+   - Application performance monitoring
+   - System health dashboards
+
+3. **Security Enhancements**
+   - Regular security audits
+ 

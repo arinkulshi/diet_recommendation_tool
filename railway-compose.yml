@@ -3,7 +3,6 @@ services:
   sqlite:
     build:
       context: ./database
-    # No volumes: Railway will handle mounting the persistent storage
     command: >
       sh -c "if [ ! -f /data/.initialized ]; then
                python sample_data.py &&
@@ -15,7 +14,6 @@ services:
   api:
     build:
       context: ./backend
-    # No local volume mounts for Railway
     ports:
       - "${PORT:-3000}:3000"
     environment:
@@ -28,7 +26,6 @@ services:
   frontend:
     build:
       context: ./frontend
-    # No local volume mounts for Railway
     ports:
       - "${FRONTEND_PORT:-5173}:${FRONTEND_PORT:-5173}"
     environment:
