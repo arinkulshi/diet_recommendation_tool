@@ -1,6 +1,6 @@
 # Nutrition and Diet Recommendation Tool
 
-This repository contains a complete Docker-based application stack for a nutrition and diet recommendation tool, including database, backend API, and frontend user interface.
+This repository contains a Docker-based application stack for a nutrition and diet recommendation tool, including database, backend API, and frontend
 
 ## System Architecture
 
