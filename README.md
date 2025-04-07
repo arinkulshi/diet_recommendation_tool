@@ -48,11 +48,10 @@ docker-compose up
 This will:
 - Create a SQLite database
 - Create the necessary tables
-- Populate the database with sample food data
+- Populate the database with sample food data (can take up to 5 minutes to seed the data)
 - Make the database ready for use
 - Run the backend
 - Run the frontend
-- 
 
 ### Accessing the Application
 
