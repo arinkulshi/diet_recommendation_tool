@@ -1,10 +1,11 @@
 import React from 'react';
 import { Food } from '../../api/types';
 import { useFavorites } from '../../hooks/useFavorites';
+import { useToast } from '../../components/ui/Toast';
 
 interface FoodCardProps {
   food: Food;
-  onClick: () => void;
+  onClick?: () => void; // Made optional since we're not using it
   showFavoriteButton?: boolean;
 }
 
@@ -17,6 +18,9 @@ const FoodCard: React.FC<FoodCardProps> = ({ food, onClick, showFavoriteButton =
     isAddingToFavorites,
     isRemovingFromFavorites
   } = useFavorites();
+  
+  const { showToast } = useToast();
+
   // Ensure we always have valid data to display
   const safeFood = {
     brand_name: food.brand_name || '',
@@ -48,28 +52,26 @@ const FoodCard: React.FC<FoodCardProps> = ({ food, onClick, showFavoriteButton =
     if (category.includes('beverage') || category.includes('drink')) return 'bg-purple-50 border-purple-200';
     return 'bg-gray-50 border-gray-200';
   };
-  
+
   // Check if this food is in favorites
   const foodInFavorites = isFavorite(food.id);
   const favoriteId = getFavoriteId(food.id);
   
-  // Handle favorite toggle without triggering the onClick for the whole card
+  // Handle favorite toggle
   const handleFavoriteToggle = (e: React.MouseEvent) => {
-    e.stopPropagation();
+    e.stopPropagation(); // Keep this to prevent any potential issues
     if (foodInFavorites && favoriteId) {
       removeFromFavorites(favoriteId);
+      showToast(`Removed ${displayName} from favorites`, 'info');
     } else {
       addToFavorites(food.id);
+      showToast(`Added ${displayName} to favorites`, 'success');
     }
   };
   
-  // Log card rendering for debugging
-  console.log("Rendering FoodCard for:", displayName);
-  
   return (
     <div
-      onClick={onClick}
-      className={`border-2 rounded-xl p-5 hover:shadow-lg cursor-pointer transition-all duration-300 transform hover:-translate-y-1 ${getCategoryColor()} relative`}
+      className={`border-2 rounded-xl p-5 shadow-md transition-all duration-300 ${getCategoryColor()} relative`}
     >
       {/* Favorite Button */}
       {showFavoriteButton && (
@@ -86,13 +88,13 @@ const FoodCard: React.FC<FoodCardProps> = ({ food, onClick, showFavoriteButton =
               </svg>
             </span>
           ) : foodInFavorites ? (
-            <span className="text-red-500 hover:text-red-700">
+            <span className="text-red-500 hover:text-red-700 transition-all duration-300 transform hover:scale-110">
               <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                 <path d="M10 18l-1.45-1.315C3.4 12.175 0 9.235 0 5.5 0 2.42 2.42 0 5.5 0c1.74 0 3.41.81 4.5 2.09C11.09.81 12.76 0 14.5 0 17.58 0 20 2.42 20 5.5c0 3.735-3.4 6.675-8.55 11.185L10 18z"/>
               </svg>
             </span>
           ) : (
-            <span className="text-gray-400 hover:text-red-500">
+            <span className="text-gray-400 hover:text-red-500 transition-all duration-300 transform hover:scale-110">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
               </svg>
