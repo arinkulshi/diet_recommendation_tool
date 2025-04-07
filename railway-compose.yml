@@ -1,0 +1,39 @@
+version: '3'
+services:
+  sqlite:
+    build:
+      context: ./database
+    # No volumes: Railway will handle mounting the persistent storage
+    command: >
+      sh -c "if [ ! -f /data/.initialized ]; then
+               python sample_data.py &&
+               touch /data/.initialized;
+             fi &&
+             echo 'Database is ready!' &&
+             tail -f /dev/null"
+  
+  api:
+    build:
+      context: ./backend
+    # No local volume mounts for Railway
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      - NODE_ENV=production
+      - DB_PATH=/data/nutrition.db
+    depends_on:
+      - sqlite
+    command: npm run start
+  
+  frontend:
+    build:
+      context: ./frontend
+    # No local volume mounts for Railway
+    ports:
+      - "${FRONTEND_PORT:-5173}:${FRONTEND_PORT:-5173}"
+    environment:
+      - NODE_ENV=production
+      - PORT=${FRONTEND_PORT:-5173}
+    depends_on:
+      - api
+    command: npm run build && npm run start
