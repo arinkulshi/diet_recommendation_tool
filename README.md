@@ -80,7 +80,7 @@ The database contains three tables:
    - Type-safe API responses mapped to frontend models
    - Optimistic updates for better user experience
 
-## What We'd Improve or Expand With More Time
+## What I'd Improve or Expand With More Time
 
 ### Backend Enhancements
 
