@@ -1,25 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import FoodCard from '../components/foods/FoodCard';
-
-// Define types to match your application
-interface Food {
-  id: number;
-  brand_name: string | null;
-  brand_owner: string;
-  calories: number;
-  protein: number;
-  fat: number;
-  carbohydrates: number;
-  serving_size: number;
-  serving_size_unit: string;
-  branded_food_category: string | null;
-}
+import { Food, FoodSearchResponse } from '../api/types';
 
 interface Pagination {
   total: number;
   limit: number;
   offset: number;
 }
+
+type ApiFood = Omit<Food, 'id'> & { id: string | number };
+type SearchResponse = Omit<FoodSearchResponse, 'results'> & { results: ApiFood[] };
+
+const normalizeFoods = (results: ApiFood[]): Food[] =>
+  results.map((food) => ({
+    ...food,
+    id: food.id.toString()
+  }));
 
 const SearchPage: React.FC = () => {
   const [foods, setFoods] = useState<Food[]>([]);
@@ -40,12 +36,9 @@ const SearchPage: React.FC = () => {
         throw new Error(`Search failed with status: ${response.status}`);
       }
       
-      const data = await response.json();
+      const data = (await response.json()) as SearchResponse;
       
-      setFoods(data.results.map(food => ({
-        ...food,
-        id: food.id.toString()
-      })));
+      setFoods(normalizeFoods(data.results));
       setPagination(data.pagination || null);
       setSearchTerm(query);
     } catch (err) {
@@ -65,11 +58,8 @@ const SearchPage: React.FC = () => {
         if (!response.ok) {
           throw new Error(`Initial fetch failed with status: ${response.status}`);
         }
-        const data = await response.json();
-        setFoods(data.results.map(food => ({
-          ...food,
-          id: food.id.toString()
-        })));
+        const data = (await response.json()) as SearchResponse;
+        setFoods(normalizeFoods(data.results));
         setPagination(data.pagination || null);
       } catch (err) {
         console.error('Initial fetch error:', err);
@@ -234,11 +224,8 @@ const SearchPage: React.FC = () => {
                           const response = await fetch(
                             `/api/foods/search?query=${encodeURIComponent(searchTerm)}&limit=${pagination.limit}&offset=${newOffset}`
                           );
-                          const data = await response.json();
-                          setFoods(data.results.map(food => ({
-                            ...food,
-                            id: food.id.toString()
-                          })));
+                          const data = (await response.json()) as SearchResponse;
+                          setFoods(normalizeFoods(data.results));
                           setPagination(data.pagination || null);
                         } catch (err) {
                           console.error('Pagination error:', err);
@@ -262,11 +249,8 @@ const SearchPage: React.FC = () => {
                           const response = await fetch(
                             `/api/foods/search?query=${encodeURIComponent(searchTerm)}&limit=${pagination.limit}&offset=${newOffset}`
                           );
-                          const data = await response.json();
-                          setFoods(data.results.map(food => ({
-                            ...food,
-                            id: food.id.toString()
-                          })));
+                          const data = (await response.json()) as SearchResponse;
+                          setFoods(normalizeFoods(data.results));
                           setPagination(data.pagination || null);
                         } catch (err) {
                           console.error('Pagination error:', err);

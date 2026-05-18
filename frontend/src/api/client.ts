@@ -1,33 +1,69 @@
-import axios from 'axios';
+type RequestParams = object;
 
-// Base API client setup
-const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+interface RequestOptions {
+  params?: RequestParams;
+}
 
-// Request interceptor for adding auth token if needed
-apiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+interface ApiResponse<T> {
+  data: T;
+}
 
-// Response interceptor for handling errors
-apiClient.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    // Handle common errors (401, 403, etc.)
-    if (error.response?.status === 401) {
-      // Redirect to login or handle unauthorized
-      console.error('Unauthorized, please log in');
+const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+
+const buildUrl = (path: string, params?: RequestParams) => {
+  const url = new URL(path, `${baseURL.replace(/\/$/, '')}/`);
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      url.searchParams.set(key, String(value));
     }
-    return Promise.reject(error);
+  });
+
+  return url.toString();
+};
+
+const request = async <T>(
+  method: string,
+  path: string,
+  body?: unknown,
+  options?: RequestOptions
+): Promise<ApiResponse<T>> => {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+  const token = localStorage.getItem('token');
+
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
   }
-);
+
+  const response = await fetch(buildUrl(path, options?.params), {
+    method,
+    headers,
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+
+  if (response.status === 401) {
+    console.error('Unauthorized, please log in');
+  }
+
+  if (!response.ok) {
+    throw new Error(`Request failed with status ${response.status}`);
+  }
+
+  if (response.status === 204) {
+    return { data: undefined as T };
+  }
+
+  return { data: (await response.json()) as T };
+};
+
+const apiClient = {
+  get: <T>(path: string, options?: RequestOptions) => request<T>('GET', path, undefined, options),
+  post: <T>(path: string, body?: unknown, options?: RequestOptions) =>
+    request<T>('POST', path, body, options),
+  delete: <T>(path: string, options?: RequestOptions) =>
+    request<T>('DELETE', path, undefined, options),
+};
 
 export default apiClient;
