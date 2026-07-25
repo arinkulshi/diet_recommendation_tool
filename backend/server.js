@@ -1,7 +1,6 @@
 // server.js - Entry point for the application
 const express = require('express');
 const cors = require('cors');
-const morgan = require('morgan');
 const config = require('./config');
 const db = require('./database');
 const routes = require('./routes');
@@ -13,7 +12,6 @@ const port = config.port;
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(morgan('dev')); // Logging middleware
 
 // Register routes
 app.use('/api', routes);

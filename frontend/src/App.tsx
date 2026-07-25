@@ -1,20 +1,22 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
 import MainLayout from './components/layout/MainLayout';
 import SearchPage from './pages/SearchPage';
 import FavoritesPage from './pages/FavoritesPage';
 import RecommendationsPage from './pages/RecommendationsPage';
+import { usePathname } from './utils/routing';
 
+const pages: Record<string, React.ReactNode> = {
+  '/': <SearchPage />,
+  '/favorites': <FavoritesPage />,
+  '/recommendations': <RecommendationsPage />,
+};
 
 const App: React.FC = () => {
+  const pathname = usePathname();
+
   return (
     <MainLayout>
-      <Routes>
-        <Route path="/" element={<SearchPage />} />
-        <Route path="/favorites" element={<FavoritesPage />} />
-        <Route path="/recommendations" element={<RecommendationsPage />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      {pages[pathname] ?? <SearchPage />}
     </MainLayout>
   );
 };
